@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏪 The Grand Store — Escape Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1976D2;--blue2:#42A5F5;--bl:#E3F2FD;
+  --teal:#00897B;--teal2:#4DB6AC;--tl:#E0F2F1;
+  --amber:#F9A825;--amber2:#FFD54F;--am:#FFF9C4;
+  --red:#E53935;--green:#43A047;
+  --bg:linear-gradient(135deg,#EBF5FB 0%,#E8F8F5 55%,#FFFDE7 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);min-height:100vh;background-attachment:fixed}
+h1,h2,h3,.pop{font-family:'Poppins',sans-serif}
+.page{max-width:800px;margin:0 auto;padding:16px 18px 40px}
+.card{background:#fff;border-radius:18px;box-shadow:0 4px 22px rgba(25,118,210,.09);padding:24px;margin-bottom:14px}
+.card-blue{border-top:4px solid var(--blue)}
+.card-teal{border-top:4px solid var(--teal)}
+.card-amber{border-top:4px solid var(--amber)}
+/* ── Buttons ── */
+.btn{border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;border-radius:50px;padding:10px 22px;font-size:.88rem;display:inline-flex;align-items:center;gap:6px;transition:transform .12s,box-shadow .12s}
+.btn:active{transform:scale(.96)!important}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 3px 0 #1248A0}
+.btn-blue:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #1248A0}
+.btn-teal{background:var(--teal);color:#fff;box-shadow:0 3px 0 #005046}
+.btn-teal:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #005046}
+.btn-amber{background:var(--amber);color:#333;box-shadow:0 3px 0 #B8780A}
+.btn-amber:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #B8780A}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 3px 0 #9A1B1B}
+.btn-red:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #9A1B1B}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 3px 0 #276227}
+.btn-green:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #276227}
+.btn-gray{background:#E0E0E0;color:#555}
+.btn-gray:hover:not(:disabled){background:#D0D0D0}
+.btn-outline{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+.btn-outline:hover:not(:disabled){background:var(--bl)}
+.lg{font-size:1rem;padding:13px 30px}
+.sm{font-size:.78rem;padding:6px 14px}
+.full{width:100%;justify-content:center}
+/* ── Header ── */
+.hdr{background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:2px solid #E8F4FD;padding:10px 0;position:sticky;top:0;z-index:30;box-shadow:0 2px 10px rgba(25,118,210,.08)}
+.hdr-in{max-width:800px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:12px}
+/* ── Progress ── */
+.prg{display:flex;align-items:center;flex:1}
+.prg-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.92rem;font-weight:800;transition:all .3s;flex-shrink:0}
+.prg-done{background:var(--teal);color:#fff;box-shadow:0 0 0 3px #B2DFDB}
+.prg-active{background:var(--amber);color:#333;box-shadow:0 0 0 3px #FFF9C4;animation:pls .8s ease-in-out infinite}
+.prg-future{background:#E8E8E8;color:#BBB}
+.prg-line{flex:1;height:3px;margin:0 2px;transition:background .3s}
+.prg-lbl{font-size:.58rem;font-weight:700;color:#AAA;text-align:center;margin-top:2px}
+/* ── Score pill ── */
+.sc-pill{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;padding:5px 15px;border-radius:50px;font-weight:800;font-size:.88rem;white-space:nowrap;box-shadow:0 3px 10px rgba(25,118,210,.25)}
+/* ── Inputs ── */
+input{font-family:'Inter',sans-serif;border:2px solid #E0E0E0;border-radius:11px;padding:10px 13px;font-size:.9rem;width:100%;outline:none;transition:border-color .2s,box-shadow .2s}
+input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(25,118,210,.12)}
+/* ── QCM ── */
+.opt{display:flex;align-items:center;gap:9px;padding:11px 14px;border:2px solid #E8E8E8;border-radius:12px;margin-bottom:8px;cursor:pointer;font-weight:600;font-size:.88rem;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--blue2);background:var(--bl)}
+.opt.sel{border-color:var(--blue);background:#EBF5FB}
+.opt.right{border-color:var(--green);background:#EDF7EE}
+.opt.wrong{border-color:var(--red);background:#FFEBEE}
+.let{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;transition:all .15s}
+/* ── V/F ── */
+.vfr{display:flex;align-items:center;gap:8px;padding:9px 12px;border:2px solid #E8E8E8;border-radius:12px;margin-bottom:7px;transition:all .15s;flex-wrap:wrap}
+.tvf{padding:5px 13px;border-radius:50px;border:2px solid;cursor:pointer;font-weight:700;font-size:.79rem;transition:all .15s;font-family:'Inter',sans-serif}
+/* ── Matching ── */
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mi{padding:9px 12px;border:2px solid #E8E8E8;border-radius:11px;cursor:pointer;font-weight:600;font-size:.83rem;min-height:50px;display:flex;align-items:center;transition:all .15s;line-height:1.35}
+.mi:hover:not(.mu):not(.mok):not(.mko){border-color:#7E57C2;background:#F3E5F5}
+.mi.msel{border-color:#7E57C2;background:#EDE7F6;box-shadow:0 0 0 3px rgba(126,87,194,.15)}
+.mi.mu{opacity:.4;cursor:default;border-style:dashed}
+.mi.mok{border-color:var(--green);background:#EDF7EE;opacity:1;cursor:default}
+.mi.mko{border-color:var(--red);background:#FFEBEE;opacity:1;cursor:default}
+/* ── Situation card ── */
+.sit{background:linear-gradient(135deg,#EBF5FB,#E0F2F1);border:2px solid var(--teal);border-radius:16px;padding:18px}
+.slbl{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--teal);margin-bottom:2px}
+.sval{font-weight:600;font-size:.9rem;margin-bottom:12px;line-height:1.5}
+.hint{background:var(--am);border:2px dashed var(--amber);border-radius:11px;padding:9px 13px;font-size:.83rem;font-weight:700;color:#7A5700}
+/* ── Reading ── */
+.rtxt{background:#F8FCFE;border-left:4px solid var(--blue2);padding:15px;border-radius:0 12px 12px 0;font-size:.87rem;line-height:1.8;margin-bottom:14px;color:#333}
+/* ── Stars ── */
+.stars{font-size:1.5rem;letter-spacing:2px;color:var(--amber)}
+/* ── Indice box ── */
+.ibx{background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:20px;padding:26px;text-align:center}
+.iwd{font-family:'Poppins',sans-serif;font-size:2.5rem;font-weight:900;color:#fff;letter-spacing:.06em;text-shadow:0 3px 0 rgba(0,0,0,.15)}
+/* ── Banners ── */
+.ok{background:#EDF7EE;border:2px solid var(--green);border-radius:12px;padding:11px;font-weight:700;color:#1B5E20;font-size:.88rem}
+.ko{background:#FFEBEE;border:2px solid var(--red);border-radius:12px;padding:11px;font-weight:700;color:#7F0000;font-size:.88rem}
+/* ── Modal ── */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.46);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.mbox{background:#fff;border-radius:20px;padding:26px;width:100%;max-width:400px;animation:pop .3s cubic-bezier(.17,.67,.35,1.4)}
+/* ── Achievement overlay ── */
+.achv{background:linear-gradient(135deg,var(--amber),#FF8F00);border-radius:16px;padding:16px 20px;text-align:center;margin-bottom:12px}
+/* ── Animations ── */
+@keyframes fadein{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{from{transform:scale(.55);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pls{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes scoreup{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+.fadein{animation:fadein .32s ease-out}
+.chip{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;padding:3px 11px;border-radius:50px;font-weight:700;font-size:.78rem;display:inline-block;margin:2px}
+@media(max-width:580px){.mg{grid-template-columns:1fr}.card{padding:17px}.iwd{font-size:1.85rem}.lg{font-size:.93rem;padding:11px 22px}}
+@media print{.noprint{display:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ═══════════ GAME DATA ═══════════ */
+const Q1=[
+  {q:'What is a "receipt"?',o:['A list of products to reorder','A document proving a purchase was made','A reduction applied to a product price','A card offering discounts to regulars'],c:1},
+  {q:'What does "out of stock" mean?',o:['A product is heavily discounted','A product has just been delivered','A product requires assembly in store','A product is currently unavailable'],c:3},
+  {q:'What is a "discount"?',o:['A reduction in the price of a product','A complaint submitted by a customer','A document sent to the supplier','A record of daily sales figures'],c:0},
+  {q:'What does "checkout" mean?',o:['A room used to store returned goods','A desk handling customer complaints','The area where customers pay for items','A system for tracking online orders'],c:2},
+  {q:'What is a "sales assistant"?',o:['A device that scans product barcodes','A person who helps customers in a shop','A report summarising weekly revenue','A tool used to forecast stock needs'],c:1},
+  {q:'What does "refund" mean?',o:['To place an order with a supplier','To arrange products on a shelf','To update the stock management system','To return money to a dissatisfied customer'],c:3},
+  {q:'What is an "invoice"?',o:['A document requesting payment for goods','A sign displaying a promotional offer','A record of customer loyalty points','A form used to log staff absences'],c:0},
+  {q:'What does "loyalty card" mean?',o:['A document listing available stock','A card recording delivery schedules','A card that rewards regular customers','A form completed after a purchase'],c:2},
+  {q:'What is "stock"?',o:['A special offer available for one day only','The goods available for sale in a shop','A payment method accepted at the till','A document signed by both parties'],c:1},
+  {q:'What does "complaint" mean?',o:['A request to exchange a faulty item','A promotional campaign for new products','A written agreement with a supplier','An expression of dissatisfaction from a customer'],c:3}
+];
+const Q2=[
+  {q:'What is a "supplier"?',o:['A person who manages stock on the shop floor','A customer enrolled in the loyalty programme','A company that provides goods to a store','A document confirming a delivery has arrived'],c:2},
+  {q:'What does "VAT" stand for?',o:['Value Added Tax','Vendor Account Transfer','Volume Assessment Tool','Verified Authorisation Token'],c:0},
+  {q:'What is a "price tag"?',o:['A loyalty reward attached to a product','A record of previous transactions','A report sent to the finance department','A label showing the price of a product'],c:3},
+  {q:'What does "exchange" mean in a shop?',o:['To process a payment at the till','To replace a product with a different one','To calculate the margin on an item','To request a new delivery from a supplier'],c:1},
+  {q:'What is a "cash register" (or "till")?',o:['A log of all customer complaints received','A document sent to confirm an order','A machine used to process payments','A device used to count remaining stock'],c:2},
+  {q:'What does "delivery" mean?',o:['The process of bringing goods to a location','A reduction applied at the point of sale','A certificate confirming a warranty claim','A written notice sent to a dissatisfied customer'],c:0},
+  {q:'What is a "window display"?',o:['A system used to monitor online sales','A document recording daily takings','A worksheet completed during stocktaking','An arrangement of products in a shop window to attract customers'],c:3},
+  {q:'What does "turnover" mean in business?',o:['A product that has been returned by a customer','The total revenue generated by a business over a period','A discount negotiated with a supplier','A penalty charged for late payment'],c:1},
+  {q:'What is "customer service"?',o:['The support and assistance provided to customers','The process of analysing weekly sales data','A formal agreement between two businesses','A checklist used during a stock audit'],c:0},
+  {q:'What does "markdown" mean?',o:['A comment noted in a customer file','A delivery document signed upon receipt','A bonus granted to top-performing staff','A reduction applied to the original selling price'],c:3}
+];
+const T1=`Sarah had barely unlocked the shop floor when the first customer of the day pushed through the entrance doors. Mr. Harris placed a jacket on the counter without a word and slid a crumpled receipt across to her. Sarah smoothed it out carefully. The date was clear: the purchase had been made exactly four weeks earlier, putting it just within the store's standard return window.
+
+"I need a refund," he said flatly. "The zip is broken and the lining is already coming apart. For the price I paid, that's simply not acceptable."
+
+Sarah examined the jacket. The damage was consistent with a manufacturing fault rather than misuse. She was entitled to offer a full refund, a replacement, or a repair, and she explained all three options calmly. Mr. Harris had little interest in a replacement from the same range. He accepted the refund without further comment.
+
+It was not yet mid-morning, but Sarah was already beginning to suspect it would be one of those days. A delivery had arrived while she was processing the return — twelve boxes stacked by the fire exit, blocking an emergency route. Sarah radioed the stockroom supervisor immediately. Store procedure was clear: deliveries were to be received in the loading bay and never left unattended on the shop floor.`;
+const VF=[
+  {s:"Mr. Harris's return was within the time limit set by the store.",a:true},
+  {s:"Mr. Harris arrived with all the necessary documentation.",a:true},
+  {s:"The jacket had been damaged through careless use by the customer.",a:false},
+  {s:"Sarah offered Mr. Harris only one possible solution.",a:false},
+  {s:"Mr. Harris chose to receive a new jacket from the same range.",a:false},
+  {s:"The delivery had been left in the correct area of the store.",a:false},
+  {s:"Sarah personally moved the delivery boxes to the appropriate location.",a:false},
+  {s:"The store had a clear procedure regarding the reception of deliveries.",a:true},
+  {s:"Sarah was already occupied with another task when the delivery arrived.",a:true},
+  {s:"Mr. Harris expressed dissatisfaction with the value for money of his purchase.",a:true}
+];
+const T2=`When David gathered his team for the Monday briefing, the atmosphere was noticeably tense. The figures he projected onto the screen confirmed what most had already sensed: footfall had dropped by a significant margin over the past fortnight, a trend that showed little sign of reversing. The timing could hardly have been worse — the end-of-season clearance, which historically accounted for nearly a third of the store's annual turnover, was only weeks away.
+
+David attributed the decline partly to the new retail complex on the ring road, which had drawn away a portion of their regular clientele. But he was equally candid about internal shortcomings. Mystery shopper reports had flagged inconsistent greeting standards and a failure to upsell effectively at the point of sale. "Customers are choosing to go elsewhere," he said. "We need to give them a compelling reason to come back."
+
+The proposed solutions were threefold. The visual merchandising team would overhaul the entrance displays before the end of the week. All customer-facing staff would complete a refresher module on consultative selling techniques. Finally, the store would pilot a tiered loyalty scheme — replacing the existing flat-rate points system — offering accelerated rewards to their highest-spending customers.
+
+Laura, recently promoted to assistant manager, raised the question of staff cover during the sale period. David acknowledged that rotas would need reviewing, but insisted that training had to remain the immediate priority.`;
+const Q3=[
+  {q:"What is the general mood at the start of the briefing?",o:["Tense and concerned","Enthusiastic and motivated","Relaxed and confident","Confused and poorly prepared"],c:0},
+  {q:"What does David's presentation reveal about the store?",o:["Sales had increased significantly","Customer numbers had fallen over the previous two weeks","A new product range was about to launch","The store had just reached its annual target"],c:1},
+  {q:"Why is the current timing particularly concerning for the business?",o:["A new manager has just been appointed","Several staff members have recently resigned","A major sales period is fast approaching","The store is facing serious cash flow issues"],c:2},
+  {q:"What internal problem did the mystery shopper reports identify?",o:["Products were frequently unavailable","The shop floor was poorly organised","Complaints had increased significantly","Staff were not welcoming customers or encouraging additional purchases"],c:3},
+  {q:"What does David say is needed to win customers back?",o:["A compelling reason to choose the store over competitors","Lower prices across the entire product range","A larger and more comfortable store layout","Greater investment in social media advertising"],c:0},
+  {q:"How will the loyalty scheme change under the new plan?",o:["It will be replaced with a simple discount card","It will offer enhanced rewards to the store's best customers","It will be extended to include online purchases","It will give identical rewards regardless of spending level"],c:1},
+  {q:"What task has been assigned to the visual merchandising team?",o:["Analyse the mystery shopper reports in detail","Complete a module on consultative selling","Overhaul the entrance area before the end of the week","Review the staffing rota for the sale period"],c:2},
+  {q:"What does the refresher training module aim to develop?",o:["Stock management and delivery procedures","Skills for handling customer complaints","Ability to apply and communicate discounts","Techniques for guiding customers towards additional purchases"],c:3},
+  {q:"What concern does Laura raise at the end of the meeting?",o:["Whether staffing will be sufficient during the sale","Whether the loyalty scheme will attract new customers","Whether the window display changes will be effective","Whether the training can realistically be completed in time"],c:0},
+  {q:"How does David respond to Laura's staffing concern?",o:["He agrees training should be postponed until after the sale","He acknowledges the issue but prioritises training above all","He asks Laura to manage the rota independently","He suggests holding a separate meeting on the topic"],c:1}
+];
+const SIT=[
+  {e:'🧾',t:'Situation Card #1',w:'The Grand Store — Customer Service Desk',who:"Mrs. Thompson has brought back a shirt purchased last week. She claims there is a visible defect on the collar seam. She is visibly frustrated and is demanding a full refund. She has her receipt.",r:'Sales assistant. Handle the complaint professionally and propose appropriate solutions.',h:'💡 Think about: opening the interaction / acknowledging the problem / what options you can offer and how to present them.'},
+  {e:'🎁',t:'Situation Card #2 — Rattrapage',w:'The Grand Store — Shop floor',who:"A male customer is looking for a gift for his partner. He has a budget of around 50 euros and no idea what to choose. He seems in a hurry.",r:'Sales assistant. Help the customer identify a suitable product and guide him towards a purchase.',h:'💡 Think about: how to approach the customer / useful questions to understand his needs / how to describe and recommend a product confidently.'}
+];
+const M1=[
+  {w:'Profit',d:'The money that remains after all costs have been deducted'},
+  {w:'Target',d:'A specific goal or objective set for a team or individual'},
+  {w:'Commission',d:'Additional pay calculated on the volume of sales achieved'},
+  {w:'Competitor',d:'Another business offering similar products or services'},
+  {w:'Promotion',d:'A time-limited offer designed to stimulate customer purchases'},
+  {w:'Brand',d:'A name, symbol, or design that identifies a company\'s products'},
+  {w:'Packaging',d:'The material used to contain, protect, or present a product'},
+  {w:'Shelf life',d:'The period during which a product remains fit for sale or use'},
+  {w:'Barcode',d:'A series of printed lines used to identify and price a product'},
+  {w:'Feedback',d:'Opinions or reactions from customers about a product or experience'}
+];
+const M2=[
+  {w:'Wholesale',d:'The purchase of goods in bulk at reduced prices for resale'},
+  {w:'Retail',d:'The sale of goods directly to the end consumer'},
+  {w:'Margin',d:'The difference between the cost price and the selling price'},
+  {w:'Warranty',d:'A written guarantee that a product will function as described'},
+  {w:'Catalogue',d:'A printed or digital listing of products available for purchase'},
+  {w:'Negotiation',d:'A structured discussion aimed at reaching a mutually acceptable agreement'},
+  {w:'Flagship',d:'The most prominent or important store or product in a company\'s range'},
+  {w:'Overhead',d:'Fixed running costs such as rent, utilities, and insurance'},
+  {w:'Benchmark',d:'A reference point used to evaluate or compare business performance'},
+  {w:'Prospect',d:'A potential customer who has not yet made a purchase'}
+];
+const REP=[
+  {e:'🔧',t:'Incident Report #1',i:'Customer Service Desk — Monday 11:30',x:"Mrs. Fletcher returns a blender purchased two weeks earlier, stating it failed after five uses. She presents her receipt and original packaging. The sales assistant, Tom, verifies the purchase date and confirms the product falls within the warranty period. He apologises for the inconvenience, then offers either a full replacement or a complete refund. Mrs. Fletcher opts for a replacement. Tom processes the exchange, registers the faulty unit for return to the supplier, and issues a 10% discount voucher for Mrs. Fletcher's next visit. She leaves visibly satisfied.",h:'💡 Cover: customer issue / what was verified / solutions proposed / option chosen / outcome.'},
+  {e:'📦',t:'Incident Report #2 — Rattrapage',i:'Stockroom — Monday 15:00',x:"During a routine stock count, sales assistant Kevin identifies a discrepancy: the system records twelve units of a particular jacket, but only eight are physically present. He escalates the matter to manager David, who cross-references the delivery notes from the previous week. The investigation reveals that a batch of four jackets had been received and shelved without being scanned into the inventory system. David corrects the stock records, logs the error, and issues a reminder to all staff that all incoming deliveries must be scanned and verified before being placed on the shop floor.",h:'💡 Cover: what was found / who was informed / investigation findings / corrective action taken.'},
+  {e:'💻',t:'Incident Report #3 — 2e Rattrapage',i:'Checkout area — Monday 16:30',x:"Mr. Crawford becomes confrontational at the checkout, insisting that a jacket on display was advertised at a significantly lower price on the store website. The cashier, Emma, is unable to locate the discrepancy and requests assistance from manager David. David accesses the website directly and identifies a pricing error in the product listing. He apologises to Mr. Crawford and agrees to honour the lower price. The transaction is completed at the online price. David immediately contacts the digital team to correct the listing, and the incident is entered into the complaints log.",h:'💡 Cover: what happened / what the customer claimed / investigation / how it was resolved / follow-up actions.'}
+];
+const WW=['THE','CUSTOMER','IS','ALWAYS','RIGHT'];
+/* ═══════════ STATE & UTILS ═══════════ */
+let S={scr:'home',tc:'0504',sc:'1CVA2627',g:{n:'',p:[]},pts:0,sh:[],rv:[],res:{},wr:[],allAns:[],t0:null,t1:null,l2s1:null,l3i:0,l5i:0,np:1};
+
+/* ═══════════ LOCALSTORAGE PERSISTENCE ═══════════ */
+const LS_PREFIX='grandstore_';
+function saveKey(g){
+  const ids=g.p.map(p=>p.fn+p.ln).sort().join('');
+  return LS_PREFIX+g.n.trim().toLowerCase().replace(/\s+/g,'_')+'_'+ids;
+}
+function saveProgress(){
+  if(!S.g||!S.g.n||!S.g.p.length)return;
+  try{
+    const data={scr:S.scr,pts:S.pts,sh:S.sh,rv:S.rv,
+      res:S.res,wr:S.wr,g:S.g,t0:S.t0,t1:S.t1,l2s1:S.l2s1,
+      l3i:S.l3i,l5i:S.l5i,savedAt:Date.now()};
+    localStorage.setItem(saveKey(S.g),JSON.stringify(data));
+  }catch(e){}
+}
+function loadProgress(g){
+  try{const raw=localStorage.getItem(saveKey(g));if(!raw)return null;return JSON.parse(raw);}catch(e){return null;}
+}
+function clearProgress(g){try{localStorage.removeItem(saveKey(g));}catch(e){}}
+function resumeFrom(data){
+  S.scr=data.scr;S.pts=data.pts;S.sh=data.sh;S.rv=data.rv;
+  S.res=data.res;S.wr=data.wr;S.g=data.g;
+  S.t0=data.t0;S.t1=data.t1;S.l2s1=data.l2s1;
+  S.l3i=data.l3i||0;S.l5i=data.l5i||0;E={};F={};
+  const introMap={
+    'l1q1':'l1i','l1q2':'l1i','l1d':'l1d',
+    'l2vf':'l2i','l2qm':'l2i','l2fl':'l2i','l2d':'l2d',
+    'l3or':'l3i','l3d':'l3d',
+    'l4e1':'l4i','l4e2':'l4i','l4d':'l4d',
+    'l5or':'l5i','l5d':'l5d',
+    'fin':'fin','vic':'vic','rep':'vic'
+  };
+  go(introMap[S.scr]||S.scr);
+}
+
+let E={};let F={};
+const shuf=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;};
+const pass=(n,t=10)=>n>=t*.8;
+const ftm=(s,e)=>{if(!s||!e)return'—';const d=Math.round((e-s)/1e3);return`${0|d/60}min ${d%60}s`;};
+function starRating(n,t=10){const p=n/t;if(p>=.9)return{s:3,msg:'Excellent ! 🔥',c:'#F9A825'};if(p>=.8)return{s:2,msg:'Bien joué ! 👍',c:'#00897B'};if(p>=.6)return{s:1,msg:'Peut mieux faire',c:'#1976D2'};return{s:0,msg:'Score insuffisant',c:'#E53935'};}
+function stars(n){return'<span class="stars">'+'★'.repeat(n)+'<span style="opacity:.25">'+'★'.repeat(3-n)+'</span></span>';}
+
+/* ═══════════ UI ATOMS ═══════════ */
+const btn=(t,fn,c='blue',extra='')=>`<button class="btn btn-${c} ${extra}" onclick="${fn}">${t}</button>`;
+function hdr(lvl){
+  const ls=[['📋','Vocab'],['🔍','Lecture'],['🎤','Oral'],['📌','Match'],['📊','Rapport']];
+  const dots=ls.map(([e,l],i)=>`${i>0?`<div class="prg-line" style="background:${i+1<=lvl?'var(--teal)':'#E0E0E0'}"></div>`:''}
+    <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+      <div class="prg-dot ${i+1<lvl?'prg-done':i+1===lvl?'prg-active':'prg-future'}">${i+1<lvl?'✓':e}</div>
+      <div class="prg-lbl">${l}</div>
+    </div>`).join('');
+  return `<div class="hdr noprint"><div class="hdr-in"><div class="prg">${dots}</div><div style="display:flex;align-items:center;gap:8px"><div class="sc-pill">⭐ ${S.pts} pts</div><button onclick="openPDF()" style="background:var(--blue);border:none;color:#fff;padding:5px 13px;border-radius:50px;cursor:pointer;font-weight:800;font-size:.79rem;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(25,118,210,.3);white-space:nowrap;font-family:inherit;flex-shrink:0">📄 PDF</button></div></div></div>`;
+}
+function lvlIntro(e,t,sub,desc,fn,col='blue'){
+  return `<div class="card card-${col} fadein"><div style="text-align:center;margin-bottom:18px"><div style="font-size:2.8rem">${e}</div><h2 class="pop" style="color:var(--${col});font-size:1.65rem;margin-top:5px">${t}</h2><p style="color:var(--amber);font-weight:700;font-size:.85rem;margin-top:4px">${sub}</p></div><div style="background:#F8FCFE;border-radius:11px;padding:14px;margin-bottom:18px;font-size:.9rem;color:#444;line-height:1.7">${desc}</div><div style="text-align:center">${btn("Lancer la mission 🎯",fn,'blue','lg')}</div></div>`;
+}
+function achvBanner(score,total=10){
+  const r=starRating(score,total);
+  return `<div class="achv"><div style="font-size:1.2rem;margin-bottom:4px">${stars(r.s)}</div><div style="font-weight:800;color:#fff;font-size:1rem">${r.msg}</div></div>`;
+}
+function indiceScreen(idx,onNext){
+  const w=WW[S.sh[idx]];
+  if(!S.rv.includes(w))S.rv.push(w);
+  const filled=S.rv.map(x=>`<div style="background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.5);color:#fff;padding:7px 18px;border-radius:50px;font-family:'Poppins';font-weight:900;font-size:1.1rem;display:inline-block;margin:3px">${x}</div>`).join('');
+  const empty=Array.from({length:5-S.rv.length}).map(()=>`<div style="background:rgba(0,0,0,.15);color:rgba(255,255,255,.4);padding:7px 18px;border-radius:50px;font-weight:800;font-size:1.1rem;display:inline-block;margin:3px">?</div>`).join('');
+  return `<div class="ibx fadein" style="margin-bottom:14px"><div style="font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);margin-bottom:7px">Mot secret découvert</div><div class="iwd">${w}</div><div style="color:rgba(255,255,255,.7);font-size:.82rem;margin-top:9px">📝 Notez ce mot ! Les 5 forment une phrase.</div></div>
+  <div class="card"><div class="pop" style="color:var(--blue);margin-bottom:10px;font-size:1rem">🧩 Collection (${S.rv.length}/5)</div><div style="margin-bottom:10px">${filled}${empty}</div><p style="color:#AAA;font-size:.78rem">Les fragments sont dans le désordre !</p></div>
+  <div style="text-align:center;margin-top:10px">${btn('Mission suivante →',onNext,'amber','lg')}</div>`;
+}
+
+/* ═══════════ HOME ═══════════ */
+function vHome(){
+  return `<div style="min-height:100vh;display:flex;flex-direction:column">
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:28px 18px">
+    <div style="text-align:center;max-width:520px">
+      <div style="font-size:1.8rem;margin-bottom:4px;animation:float 3s ease-in-out infinite">🏪</div>
+      <h1 class="pop" style="font-size:2.1rem;color:var(--blue);margin-bottom:5px">The Grand Store</h1>
+      <div style="background:linear-gradient(135deg,var(--blue),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;font-size:1rem;margin-bottom:5px">English Escape Game</div>
+      <p style="color:#888;font-size:.88rem;margin-bottom:30px">Bac Pro 1ère Commerce — Mission commerciale</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+        <div class="card" style="flex:1;min-width:170px;max-width:215px;text-align:center;border-top:3px solid var(--blue)">
+          <div style="font-size:2.2rem;margin-bottom:8px">🎯</div>
+          <div class="pop" style="color:var(--blue);margin-bottom:4px">Équipe</div>
+          <div style="color:#888;font-size:.82rem;margin-bottom:15px">Rejoindre la mission</div>
+          ${btn("C'est parti ! →","go('rules')",'blue','full')}
+        </div>
+        <div class="card" style="flex:1;min-width:170px;max-width:215px;text-align:center;border-top:3px solid var(--teal)">
+          <div style="font-size:2.2rem;margin-bottom:8px">👔</div>
+          <div class="pop" style="color:var(--teal);margin-bottom:4px">Professeur</div>
+          <div style="color:#888;font-size:.82rem;margin-bottom:15px">Gérer le jeu</div>
+          ${btn('Accès prof 🔑',"go('tlg')",'teal','full')}
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer style="text-align:center;padding:14px;color:#BBB;font-size:.78rem;border-top:1px solid #E8F4FD">
+    Créé par <strong style="color:var(--blue)">C. iemfre</strong> &nbsp;|&nbsp;
+    <span style="color:var(--teal);cursor:pointer;font-weight:700" onclick="go('rgpd')">🔒 RGPD</span>
+  </footer></div>`;
+}
+
+/* ═══════════ RULES PAGE ═══════════ */
+function vRules(){
+  const missions=[
+    {n:1,e:'📋',t:'Induction Room',d:'QCM vocabulaire commercial — prouvez que vous connaissez les bases du métier.',c:'var(--blue)'},
+    {n:2,e:'🔍',t:'Intelligence Desk',d:'Compréhension écrite — deux textes professionnels, deux exercices obligatoires.',c:'var(--teal)'},
+    {n:3,e:'🎤',t:'Situation Room',d:'Expression orale — gérez une situation client en anglais devant votre équipe.',c:'#7B1FA2'},
+    {n:4,e:'📌',t:'The Briefing Room',d:'Correspondance — associez les termes commerciaux à leurs définitions exactes.',c:'#E65100'},
+    {n:5,e:'📊',t:"The Manager's Office",d:'Compte rendu oral — présentez un rapport d\'incident professionnel en anglais.',c:'#1B5E20'}
+  ];
+  return `<div style="min-height:100vh;padding-bottom:30px">
+  <div style="background:linear-gradient(135deg,var(--blue),var(--teal));padding:28px 20px;text-align:center;color:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;opacity:.08;background:repeating-linear-gradient(45deg,#fff,#fff 2px,transparent 2px,transparent 14px)"></div>
+    <div style="position:relative">
+      <div style="font-size:2.5rem;margin-bottom:6px">📋</div>
+      <h1 class="pop" style="font-size:1.9rem;margin-bottom:5px">Mission Briefing</h1>
+      <div style="font-size:.9rem;opacity:.85">The Grand Store • English Escape Game</div>
+    </div>
+  </div>
+  <div class="page">
+    <div class="card" style="border-left:4px solid var(--amber);margin-top:4px">
+      <div class="pop" style="color:var(--amber);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">🚨 Contexte de mission</div>
+      <p style="color:#444;font-size:.9rem;line-height:1.75">Lundi matin. <strong>The Grand Store</strong> est en crise. Le directeur est absent, une livraison VIP a disparu et des clients importants arrivent dans deux heures. Votre équipe vient d'être recrutée comme nouveaux vendeurs. Complétez les 5 missions pour trouver les <strong>5 mots secrets</strong>. Recomposez la phrase pour entrer le Master Code et <strong>sauver le Grand Store</strong>.</p>
+    </div>
+    <div class="pop" style="color:var(--blue);margin:18px 0 10px;font-size:1rem">🗺️ Les 5 missions</div>
+    <div style="display:grid;gap:9px;margin-bottom:18px">
+      ${missions.map(m=>`<div class="card" style="display:flex;align-items:flex-start;gap:13px;padding:14px 18px;border-left:4px solid ${m.c}">
+        <div style="width:38px;height:38px;border-radius:50%;background:${m.c};color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0">${m.e}</div>
+        <div><div style="font-weight:800;font-size:.92rem;color:#333">Mission ${m.n} — ${m.t}</div><div style="color:#888;font-size:.82rem;margin-top:3px;line-height:1.5">${m.d}</div></div>
+      </div>`).join('')}
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <div class="pop" style="color:var(--amber);margin-bottom:12px">📐 Règles du jeu</div>
+      <div style="display:grid;gap:8px;font-size:.87rem">
+        ${[['⭐ Points','<strong>+50 pts</strong> par exercice réussi (≥ 80% de bonnes réponses).'],
+           ['⚠️ Mission 2','Les 2 exercices sont <strong>obligatoires</strong>. Échec sur l\'un = <strong>−25 pts</strong> + retour Mission 1.'],
+           ['🎤 Oral','Les Missions 3 & 5 nécessitent la <strong>validation du professeur</strong>.'],
+           ['🧩 Code secret','5 fragments révélés dans le désordre. Recomposez la phrase pour gagner.'],
+           ['📥 Rapport','PDF coloré téléchargeable à la fin avec résultats et erreurs détaillées.']
+        ].map(([k,v])=>`<div style="display:flex;gap:10px;background:#F8FCFE;padding:10px 12px;border-radius:10px;align-items:flex-start"><span style="flex-shrink:0;font-size:1rem">${k.split(' ')[0]}</span><span><strong>${k.split(' ').slice(1).join(' ')} :</strong> <span style="color:#555">${v}</span></span></div>`).join('')}
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:18px">
+      ${btn('✅ Accepter la mission',"go('slg')",'blue','lg')}
+      <div style="margin-top:10px">${btn('← Retour',"go('home')",'gray','sm')}</div>
+    </div>
+  </div></div>`;
+}
+
+/* ═══════════ LOGIN ═══════════ */
+function vLogin(title,next){
+  const isT=next==='tdb';
+  return `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="card fadein" style="max-width:380px;width:100%;border-top:4px solid ${isT?'var(--teal)':'var(--blue)'}">
+    <div style="color:#AAA;cursor:pointer;font-size:.83rem;margin-bottom:14px" onclick="go('home')">← Accueil</div>
+    <div style="text-align:center;margin-bottom:20px"><div style="font-size:2.5rem">${isT?'👔':'🎯'}</div>
+      <h2 class="pop" style="color:${isT?'var(--teal)':'var(--blue)'};font-size:1.55rem;margin-top:6px">${title}</h2>
+    </div>
+    <input id="lgc" type="password" placeholder="Entrez le code d'accès" style="margin-bottom:9px" onkeydown="if(event.key==='Enter')doLogin('${next}')">
+    <div id="lge" style="color:var(--red);font-weight:700;font-size:.83rem;min-height:17px;margin-bottom:8px"></div>
+    ${btn('Accéder →',`doLogin('${next}')`,'blue','full')}
+  </div></div>`;
+}
+function doLogin(next){
+  const v=(document.getElementById('lgc')||{}).value||'';
+  if(v===(next==='tdb'?S.tc:S.sc))go(next);
+  else{const e=document.getElementById('lge');if(e)e.textContent='Code incorrect. Réessayez.';}
+}
+
+/* ═══════════ TEACHER ═══════════ */
+function vTeacher(){
+  return `<div style="min-height:100vh;padding:20px"><div style="max-width:700px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-top:6px">
+    <h2 class="pop" style="color:var(--teal);font-size:1.55rem">👔 Interface Professeur</h2>
+    ${btn('← Accueil',"go('home')",'gray','sm')}
+  </div>
+  <div class="card card-teal"><div class="pop" style="color:var(--teal);margin-bottom:11px">🔑 Code d'accès équipes</div>
+    <p style="color:#888;font-size:.87rem;margin-bottom:5px">Code fixé par l'enseignant : <strong style="color:var(--teal);font-family:monospace;font-size:1.15rem">1CVA2627</strong></p>
+    <p style="color:#AAA;font-size:.78rem">Communiquez ce code aux équipes avant de lancer le jeu.</p>
+  </div>
+  <div class="card card-blue"><div class="pop" style="color:var(--blue);margin-bottom:12px">📋 Récapitulatif du jeu</div>
+    ${[['Master Code final','THE CUSTOMER IS ALWAYS RIGHT (indices révélés dans le désordre)'],
+       ['Système de points','+50 pts par exercice réussi (≥80%) • −25 pts si échec Mission 2'],
+       ['Mission 2','Les DEUX exercices sont obligatoires — 80% requis sur chacun'],
+       ['Missions orales (3 & 5)','Validation manuelle avec votre code professeur (0504)']
+    ].map(([k,v])=>`<div style="background:#F0F7FF;padding:10px 13px;border-radius:10px;margin-bottom:8px;font-size:.86rem"><strong style="color:var(--blue)">${k} :</strong> <span style="color:#555">${v}</span></div>`).join('')}
+  </div>
+  <div class="card card-teal"><div class="pop" style="color:var(--teal);margin-bottom:12px">🎓 Critères d'évaluation orale</div>
+    ${[['Mission 3 — Situation client','Accueil professionnel, identification du problème, solutions proposées correctement, vocabulaire commercial adapté.'],
+       ['Mission 5 — Compte rendu','Structure who/what/when/action/result, phrases simples et correctes, vocabulaire professionnel.']
+    ].map(([k,v])=>`<div style="background:#E0F2F1;padding:11px 13px;border-radius:10px;border:1px solid #80CBC4;margin-bottom:8px;font-size:.86rem"><strong style="color:var(--teal)">${k} :</strong> <span style="color:#555">${v}</span></div>`).join('')}
+  </div></div></div>`;
+}
+/* ═══════════ GROUP SETUP ═══════════ */
+function vGroup(){
+  const n=S.np||1;
+  const curName=(F.gn||'').trim();
+  const curParts=[];
+  for(let i=0;i<n;i++){const fn=(F['fn'+i]||'').toUpperCase().slice(0,2),ln=(F['ln'+i]||'').toUpperCase().slice(0,2);if(fn&&ln)curParts.push({fn,ln});}
+  const previewSave=curName&&curParts.length===n?loadProgress({n:curName,p:curParts}):null;
+  const savedAt=previewSave?new Date(previewSave.savedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'}):null;
+  const lvlNames={'l1i':'Mission 1','l1d':'Mission 1 terminée','l2i':'Mission 2','l2d':'Mission 2 terminée','l3i':'Mission 3','l3d':'Mission 3 terminée','l4i':'Mission 4','l4d':'Mission 4 terminée','l5i':'Mission 5','l5d':'Mission 5 terminée','fin':'Code final','vic':'Victoire'};
+  const savedLvl=previewSave?lvlNames[previewSave.scr]||previewSave.scr:'';
+  const rows=Array.from({length:n},(_,i)=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:7px;margin-bottom:7px;align-items:center">
+    <input id="fn${i}" type="text" placeholder="JO" value="${F['fn'+i]||''}" oninput="F['fn${i}']=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2);rChip(${i});checkSave()" style="text-align:center;font-weight:800;font-family:monospace;letter-spacing:.12em">
+    <input id="ln${i}" type="text" placeholder="SM" value="${F['ln'+i]||''}" oninput="F['ln${i}']=this.value.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2);rChip(${i});checkSave()" style="text-align:center;font-weight:800;font-family:monospace;letter-spacing:.12em">
+    <div id="chip${i}" style="text-align:center">${F['fn'+i]&&F['ln'+i]?`<span class="chip">${F['fn'+i]}-${F['ln'+i]}</span>`:'<span style="color:#DDD;font-weight:800">--</span>'}</div>
+    <button onclick="if(${n}>1){S.np--;F={};render();}" style="width:28px;height:28px;border:none;background:${n>1?'var(--red)':'#EEE'};color:${n>1?'#fff':'#CCC'};border-radius:50%;cursor:${n>1?'pointer':'not-allowed'};font-weight:800;font-size:.9rem">×</button>
+  </div>`).join('');
+  const resumeBlock=previewSave?`<div style="background:linear-gradient(135deg,#E0F2F1,#FFF8E1);border:2px solid var(--teal);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div style="font-weight:800;color:var(--teal);font-size:.88rem;margin-bottom:5px">🔄 Progression retrouvée !</div>
+    <div style="font-size:.83rem;color:#555;margin-bottom:10px">Dernière sauvegarde le <strong>${savedAt}</strong> — arrêtée à <strong>${savedLvl}</strong> · <strong>${previewSave.pts} pts</strong></div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap">${btn('▶ Reprendre','resumeGame()','teal','full')}${btn('🆕 Nouvelle partie','newGame()','red','')}</div>
+  </div>`:'' ;
+  return `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div class="card fadein" style="max-width:530px;width:100%;border-top:4px solid var(--blue)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:2.5rem">🏪</div>
+      <h2 class="pop" style="color:var(--blue);font-size:1.6rem;margin-top:6px">Identification équipe</h2>
+      <p style="color:#888;font-size:.83rem;margin-top:3px">Identifiez-vous pour accéder à votre progression</p>
+    </div>
+    <label style="font-weight:700;display:block;margin-bottom:6px;font-size:.87rem;color:#444">🏷️ Nom de l'équipe</label>
+    <input id="gn" type="text" placeholder="Ex : Team Alpha" value="${F.gn||''}" oninput="F.gn=this.value;checkSave()" style="margin-bottom:15px">
+    <label style="font-weight:700;display:block;margin-bottom:6px;font-size:.87rem;color:#444">👤 Participants (${n}/4)</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:7px;margin-bottom:7px;background:#F5F5F5;padding:7px 10px;border-radius:9px">
+      ${['2 lettres prénom','2 lettres nom','ID',''].map(h=>`<div style="font-size:.68rem;font-weight:800;color:#AAA;text-align:center">${h}</div>`).join('')}
+    </div>
+    ${rows}
+    ${n<4?`<div style="margin-bottom:12px">${btn('+ Ajouter un membre','addPart()','gray','sm')}</div>`:''}
+    <div id="ge" style="color:var(--red);font-weight:700;font-size:.83rem;min-height:17px;margin-bottom:10px"></div>
+    <div id="saveblock">${resumeBlock}</div>
+    ${!previewSave?btn('🚀 Lancer la mission !','startGame()','blue','full lg'):''}
+  </div></div>`;
+}
+function rChip(i){const e=document.getElementById('chip'+i);if(!e)return;const fn=(F['fn'+i]||'').slice(0,2),ln=(F['ln'+i]||'').slice(0,2);e.innerHTML=fn&&ln?`<span class="chip">${fn}-${ln}</span>`:'<span style="color:#DDD;font-weight:800">--</span>';}
+function addPart(){if(S.np<4)S.np++;render();}
+function checkSave(){
+  const name=(document.getElementById('gn')||{}).value||F.gn||'';
+  const n=S.np||1;const parts=[];
+  for(let i=0;i<n;i++){const fn=(F['fn'+i]||'').toUpperCase().slice(0,2),ln=(F['ln'+i]||'').toUpperCase().slice(0,2);if(fn&&ln)parts.push({fn,ln});}
+  const sb=document.getElementById('saveblock');if(!sb)return;
+  if(!name.trim()||parts.length!==n){sb.innerHTML='';return;}
+  const save=loadProgress({n:name.trim(),p:parts});if(!save){sb.innerHTML='';return;}
+  const lvlNames={'l1i':'Mission 1','l1d':'Mission 1 terminée','l2i':'Mission 2','l2d':'Mission 2 terminée','l3i':'Mission 3','l3d':'Mission 3 terminée','l4i':'Mission 4','l4d':'Mission 4 terminée','l5i':'Mission 5','l5d':'Mission 5 terminée','fin':'Code final','vic':'Victoire'};
+  const savedLvl=lvlNames[save.scr]||save.scr;
+  const savedAt=new Date(save.savedAt).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'});
+  sb.innerHTML=`<div style="background:linear-gradient(135deg,#E0F2F1,#FFF8E1);border:2px solid var(--teal);border-radius:12px;padding:14px 16px;margin-bottom:14px">
+    <div style="font-weight:800;color:var(--teal);font-size:.88rem;margin-bottom:5px">🔄 Progression retrouvée !</div>
+    <div style="font-size:.83rem;color:#555;margin-bottom:10px">Dernière sauvegarde le <strong>${savedAt}</strong> — arrêtée à <strong>${savedLvl}</strong> · <strong>${save.pts} pts</strong></div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap">${btn('▶ Reprendre','resumeGame()','teal','full')}${btn('🆕 Nouvelle partie','newGame()','red','')}</div>
+  </div>`;
+}
+function resumeGame(){
+  const name=(document.getElementById('gn')||{}).value||F.gn||'';
+  const n=S.np||1;const parts=[];
+  for(let i=0;i<n;i++){const fn=(F['fn'+i]||'').toUpperCase().slice(0,2),ln=(F['ln'+i]||'').toUpperCase().slice(0,2);if(fn&&ln)parts.push({fn,ln});}
+  const save=loadProgress({n:name.trim(),p:parts});if(save)resumeFrom(save);
+}
+function newGame(){
+  const name=(document.getElementById('gn')||{}).value||F.gn||'';
+  if(!name.trim()){const e=document.getElementById('ge');if(e)e.textContent="Entrez le nom de l'équipe";return;}
+  const n=S.np||1;const parts=[];
+  for(let i=0;i<n;i++){const fn=(F['fn'+i]||'').toUpperCase().slice(0,2),ln=(F['ln'+i]||'').toUpperCase().slice(0,2);if(!fn||!ln){const e=document.getElementById('ge');if(e)e.textContent='Remplissez tous les participants';return;}parts.push({fn,ln});}
+  clearProgress({n:name.trim(),p:parts});
+  S.sh=shuf([0,1,2,3,4]);S.rv=[];S.res={};S.wr=[];S.pts=0;
+  S.g={n:name.trim(),p:parts};S.t0=Date.now();S.t1=null;
+  S.l2s1=null;S.l3i=0;S.l5i=0;F={};go('l1i');
+}
+function startGame(){
+  const name=(document.getElementById('gn')||{}).value||F.gn||'';
+  if(!name.trim()){const e=document.getElementById('ge');if(e)e.textContent="Entrez le nom de l'équipe";return;}
+  const parts=[];
+  for(let i=0;i<(S.np||1);i++){
+    const fn=(F['fn'+i]||'').toUpperCase().slice(0,2);
+    const ln=(F['ln'+i]||'').toUpperCase().slice(0,2);
+    if(!fn||!ln){const e=document.getElementById('ge');if(e)e.textContent='Remplissez tous les participants';return;}
+    parts.push({fn,ln});
+  }
+  clearProgress({n:name.trim(),p:parts});
+  S.sh=shuf([0,1,2,3,4]);S.rv=[];S.res={};S.wr=[];S.pts=0;
+  S.g={n:name.trim(),p:parts};S.t0=Date.now();S.t1=null;
+  S.l2s1=null;S.l3i=0;S.l5i=0;F={};go('l1i');
+}
+
+/* ═══════════ QCM ═══════════ */
+function vQCM(){
+  const{qs,cur=0,ans={},done=false}=E;
+  if(!qs)return'';
+  const q=qs[cur];const L='ABCD';const CC=['var(--blue)','var(--teal)','var(--amber)','#7B1FA2'];
+  const dots=qs.map((_,i)=>{const c=done?(ans[i]===qs[i].c?'var(--green)':'var(--red)'):(ans[i]!=null?'var(--blue)':'#DDD');return`<div onclick="E.cur=${i};render()" style="width:9px;height:9px;border-radius:50%;background:${c};cursor:pointer;display:inline-block;margin:2px"></div>`;}).join('');
+  const opts=q.o.map((opt,oi)=>{
+    let bc='#E8E8E8',bg='#fff';
+    if(ans[cur]===oi){bc='var(--blue)';bg='#EBF5FB';}
+    if(done&&oi===q.c){bc='var(--green)';bg='#EDF7EE';}
+    if(done&&ans[cur]===oi&&oi!==q.c){bc='var(--red)';bg='#FFEBEE';}
+    const lbg=ans[cur]===oi?CC[oi]:'#F0F0F0',lc=ans[cur]===oi?'#fff':'#999';
+    const mk=done?(oi===q.c?' ✓':(ans[cur]===oi?' ✗':'')):'';
+    return`<div class="opt ${ans[cur]===oi?'sel':''} ${done&&oi===q.c?'right':''} ${done&&ans[cur]===oi&&oi!==q.c?'wrong':''}" onclick="${done?'':(`E.ans[${cur}]=${oi};render()`)}" style="border-color:${bc};background:${bg}">
+      <div class="let" style="background:${lbg};color:${lc}">${L[oi]}</div>
+      <span style="flex:1">${opt}</span><span style="font-weight:800;color:${done&&oi===q.c?'var(--green)':'var(--red)'}">${mk}</span>
+    </div>`;
+  }).join('');
+  const allA=Object.keys(ans).length===qs.length;
+  const score=qs.filter((_,i)=>ans[i]===qs[i].c).length;
+  const bot=done
+    ?`<div style="display:flex;gap:10px;width:100%;align-items:center;flex-wrap:wrap;margin-top:4px">${achvBanner(score)}<div style="display:flex;gap:8px;width:100%"><div class="${pass(score)?'ok':'ko'}" style="flex:1;margin:0">${score}/${qs.length} ${pass(score)?'✓ Réussi':'✗ Insuffisant'}</div>${btn('Continuer →','qcmDone()','teal')}</div></div>`
+    :(allA?btn('✅ Valider mes réponses','E.done=true;render()','blue'):`<small style="color:#CCC;font-size:.78rem">${Object.keys(ans).length}/${qs.length} répondues</small>`);
+  return`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
+      <span style="color:#AAA;font-size:.8rem;font-weight:700">Question ${cur+1} / ${qs.length}</span><div>${dots}</div>
+    </div>
+    <div style="background:#F0F7FF;border-radius:11px;padding:13px;margin-bottom:12px;font-weight:600;font-size:.9rem;line-height:1.5;color:#333">${q.q}</div>
+    ${opts}
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;gap:6px">
+        ${cur>0?btn('← Préc.',`E.cur=${cur-1};render()`,'gray','sm'):''}
+        ${cur<qs.length-1?btn('Suiv. →',`E.cur=${cur+1};render()`,'blue','sm'):''}
+      </div>${bot}
+    </div>
+  </div>`;
+}
+function qcmDone(){
+  const{qs,ans={},lbl=''}=E;
+  const score=qs.filter((_,i)=>ans[i]===qs[i].c).length;
+  const wrong=qs.flatMap((q,i)=>ans[i]!==q.c?[{level:lbl,question:q.q,given:ans[i]!=null?q.o[ans[i]]:'—',correct:q.o[q.c]}]:[]);
+  S.wr.push(...wrong);
+  S.allAns.push(...qs.map((q,i)=>({level:lbl,question:q.q,given:ans[i]!=null?q.o[ans[i]]:'—',correct:q.o[q.c],ok:ans[i]===q.c})));
+  if(S.scr==='l1q1'){S.res['M1-Ex1']={score,passed:pass(score)};if(pass(score)){S.pts+=50;go('l1d');}else go('l1q2',{qs:Q2,cur:0,ans:{},done:false,lbl:'M1-Rattrapage'});}
+  else if(S.scr==='l1q2'){S.res['M1-Ex2']={score,passed:pass(score)};if(pass(score))S.pts+=50;go('l1d');}
+  else if(S.scr==='l2qm'){
+    S.res['M2-QCM']={score,passed:pass(score)};
+    if(pass(S.l2s1)&&pass(score)){S.pts+=100;go('l2d');}
+    else{S.pts=Math.max(0,S.pts-25);go('l2fl');}
+  }
+}
+
+/* ═══════════ V/F ═══════════ */
+function vVF(){
+  const{qs,text,ans={},done=false}=E;if(!qs)return'';
+  const score=qs.filter((q,i)=>ans[i]===q.a).length;
+  const rows=qs.map((q,i)=>{
+    const bg=done?(ans[i]===q.a?'#EDF7EE':'#FFEBEE'):'#fff';
+    const bc=done?(ans[i]===q.a?'var(--green)':'var(--red)'):'#E8E8E8';
+    return`<div class="vfr" style="background:${bg};border-color:${bc}">
+      <span style="width:21px;height:21px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:#fff;flex-shrink:0">${i+1}</span>
+      <span style="flex:1;font-weight:600;font-size:.86rem;line-height:1.4">${q.s}</span>
+      <div style="display:flex;gap:5px;flex-shrink:0">
+        <button class="tvf" onclick="${done?'':(`E.ans[${i}]=true;render()`)}" style="border-color:var(--green);color:${ans[i]===true?'#fff':'var(--green)'};background:${ans[i]===true?'var(--green)':'#fff'}">TRUE</button>
+        <button class="tvf" onclick="${done?'':(`E.ans[${i}]=false;render()`)}" style="border-color:var(--red);color:${ans[i]===false?'#fff':'var(--red)'};background:${ans[i]===false?'var(--red)':'#fff'}">FALSE</button>
+      </div>
+      ${done?`<span style="font-weight:800;color:${ans[i]===q.a?'var(--green)':'var(--red)'}">${ans[i]===q.a?'✓':'✗'}</span>`:''}
+    </div>`;
+  }).join('');
+  const allA=Object.keys(ans).length===qs.length;
+  const bot=done
+    ?`<div style="display:flex;gap:10px;width:100%;align-items:center;flex-wrap:wrap">${achvBanner(score)}<div style="display:flex;gap:8px;width:100%"><div class="${pass(score)?'ok':'ko'}" style="flex:1;margin:0">${score}/${qs.length} ${pass(score)?'✓ Réussi':'✗ Insuffisant'}</div>${btn('Continuer →','vfDone()','teal')}</div></div>`
+    :btn('✅ Valider',`E.done=true;render()`,'blue','',!allA);
+  return`<div class="rtxt"><strong style="color:var(--blue2);font-size:.8rem">📄 The Returns Desk</strong><br><br>${text.replace(/\n\n/g,'<br><br>')}</div>${rows}<div style="margin-top:12px;display:flex;justify-content:flex-end">${bot}</div>`;
+}
+function vfDone(){
+  const{qs,ans={}}=E;
+  const score=qs.filter((q,i)=>ans[i]===q.a).length;
+  const wrong=qs.flatMap((q,i)=>ans[i]!==q.a?[{level:'M2-VF',question:q.s,given:ans[i]?'TRUE':'FALSE',correct:q.a?'TRUE':'FALSE'}]:[]);
+  S.wr.push(...wrong);
+  S.allAns.push(...qs.map((q,i)=>({level:'M2-VF',question:q.s,given:ans[i]===true?'TRUE':ans[i]===false?'FALSE':'—',correct:q.a?'TRUE':'FALSE',ok:ans[i]===q.a})));
+  S.res['M2-VF']={score,passed:pass(score)};S.l2s1=score;
+  go('l2qm',{qs:Q3,cur:0,ans:{},done:false,lbl:'M2-QCM'});
+}
+
+/* ═══════════ MATCHING ═══════════ */
+function vMatch(){
+  const{ps,sh,sel,mt={},done=false}=E;if(!ps)return'';
+  const used=Object.values(mt);
+  const words=ps.map((p,i)=>{
+    const isM=mt[i]!=null,ok=done&&mt[i]===i,ko=done&&isM&&mt[i]!==i;
+    return`<div class="mi${sel===i?' msel':''}${isM&&!done?' mu':''}${ok?' mok':''}${ko?' mko':''}" onclick="${done||isM?'':(`selW(${i})`)}" style="${ok?'border-color:var(--green)':ko?'border-color:var(--red)':sel===i?'border-color:#7B1FA2':''}">
+      <strong style="flex:1">${p.w}</strong>
+      ${isM&&!done?'<span style="color:#7B1FA2;font-size:.72rem">✓</span>':''}
+      ${ok?'<span style="color:var(--green)">✓</span>':''}${ko?'<span style="color:var(--red)">✗</span>':''}
+    </div>`;
+  }).join('');
+  const defs=sh.map(orig=>{
+    const isU=used.includes(orig);
+    const mKey=Object.keys(mt).find(k=>mt[k]===orig);
+    const ok=done&&mKey!=null&&Number(mKey)===orig;
+    const ko=done&&isU&&!ok;
+    return`<div class="mi${isU&&!done?' mu':''}${ok?' mok':''}${ko?' mko':''}" onclick="${isU?'':(`selD(${orig})`)}" style="${ok?'border-color:var(--green)':ko?'border-color:var(--red)':''}">${ps[orig].d}</div>`;
+  }).join('');
+  const allM=Object.keys(mt).length===ps.length;
+  const score=ps.filter((_,i)=>mt[i]===i).length;
+  const bot=done
+    ?`<div style="display:flex;gap:10px;width:100%;flex-wrap:wrap">${achvBanner(score)}<div style="display:flex;gap:8px;width:100%"><div class="${pass(score)?'ok':'ko'}" style="flex:1;margin:0">${score}/${ps.length} ${pass(score)?'✓ Réussi':'✗ Insuffisant'}</div>${btn('Continuer →','matchDone()','teal')}</div></div>`
+    :(allM?btn('✅ Valider','E.done=true;render()','blue'):`<small style="color:#CCC;font-size:.78rem">${Object.keys(mt).length}/${ps.length} associés</small>`);
+  return`<p style="color:#AAA;font-size:.8rem;margin-bottom:10px;font-weight:700">① Cliquez un terme → ② Cliquez sa définition</p>
+  <div class="mg"><div><div style="font-weight:800;color:#7B1FA2;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Termes</div>${words}</div>
+  <div><div style="font-weight:800;color:var(--amber);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Définitions</div>${defs}</div></div>
+  <div style="margin-top:13px;display:flex;justify-content:flex-end">${bot}</div>`;
+}
+function selW(i){if(E.done||E.mt[i]!=null)return;E.sel=E.sel===i?null:i;render();}
+function selD(orig){if(E.done||Object.values(E.mt||{}).includes(orig)||E.sel==null)return;if(!E.mt)E.mt={};E.mt[E.sel]=orig;E.sel=null;render();}
+function matchDone(){
+  const{ps,mt={},lbl=''}=E;
+  const score=ps.filter((_,i)=>mt[i]===i).length;
+  const wrong=ps.flatMap((p,i)=>mt[i]!==i?[{level:lbl,question:`Match: ${p.w}`,given:mt[i]!=null?ps[mt[i]]?.d:'—',correct:p.d}]:[]);
+  S.wr.push(...wrong);
+  S.allAns.push(...ps.map((p,i)=>({level:lbl,question:p.w,given:mt[i]!=null?ps[mt[i]]?.d:'—',correct:p.d,ok:mt[i]===i})));
+  if(S.scr==='l4e1'){S.res['M4-Ex1']={score,passed:pass(score)};if(pass(score)){S.pts+=50;go('l4d');}else go('l4e2',{ps:M2,sh:shuf(M2.map((_,i)=>i)),sel:null,mt:{},done:false,lbl:'M4-Rattrapage'});}
+  else{S.res['M4-Ex2']={score,passed:pass(score)};if(pass(score))S.pts+=50;go('l4d');}
+}
+/* ═══════════ ORAL ═══════════ */
+function vOral(content,isRep=false){
+  const step=E.step||'card';
+  let body='';
+  if(step==='card'){
+    const inner=isRep
+      ?`<div class="sit"><div class="slbl">📋 Incident Report</div><div style="font-weight:800;color:#333;margin-bottom:3px">${content.t}</div><div style="color:#888;font-size:.8rem;margin-bottom:10px">${content.i}</div><div style="font-size:.87rem;line-height:1.78;color:#333">${content.x}</div></div>`
+      :`<div class="sit"><div class="slbl">📍 Lieu</div><div class="sval">${content.w}</div><div class="slbl">👤 Contexte</div><div class="sval">${content.who}</div><div class="slbl">🎭 Votre rôle</div><div class="sval">${content.r}</div></div>`;
+    body=`${inner}<div class="hint" style="margin-top:12px;margin-bottom:16px">${content.h}</div>
+    <div style="text-align:center"><p style="color:#888;font-size:.86rem;margin-bottom:10px">Lisez attentivement, puis préparez votre intervention.</p>${btn('🎤 Je suis prêt(e)','E.step="presenting";render()','blue','lg')}</div>`;
+  } else if(step==='presenting'){
+    body=`<div style="background:linear-gradient(135deg,#EBF5FB,#E0F2F1);border:2px solid var(--teal);border-radius:14px;padding:20px;text-align:center">
+      <div style="font-size:2rem;margin-bottom:8px">🎤</div>
+      <p style="font-weight:700;color:var(--teal);margin-bottom:14px;font-size:.95rem">L'élève présente son oral en anglais…</p>
+      <p style="color:#888;font-size:.82rem;margin-bottom:16px">Lorsque la présentation est terminée, le professeur valide ci-dessous.</p>
+      ${btn('👔 Validation Professeur','E.step="pcode";render()','teal','lg')}
+    </div>`;
+  } else if(step==='pcode'){
+    body=`<div style="background:#F0F7FF;border:2px solid var(--blue);border-radius:14px;padding:22px">
+      <div style="text-align:center;margin-bottom:16px"><div style="font-size:2.2rem">👔</div>
+        <h3 class="pop" style="color:var(--blue);margin-top:4px">Code Professeur</h3>
+        <p style="color:#888;font-size:.82rem;margin-top:3px">Entrez votre code pour accéder à la validation</p>
+      </div>
+      <input id="ocode" type="password" placeholder="Code professeur" style="margin-bottom:9px" onkeydown="if(event.key==='Enter')checkOCode()">
+      <div id="oerr" style="color:var(--red);font-weight:700;font-size:.82rem;min-height:16px;margin-bottom:8px"></div>
+      ${btn('Valider le code →','checkOCode()','blue','full')}
+    </div>`;
+  } else if(step==='pvalidate'){
+    body=`<div style="background:#E0F2F1;border:2px solid var(--teal);border-radius:14px;padding:22px;text-align:center">
+      <div style="font-size:2.2rem;margin-bottom:8px">🏆</div>
+      <h3 class="pop" style="color:var(--teal);margin-bottom:5px">Résultat de l'oral</h3>
+      <p style="color:#555;font-size:.88rem;margin-bottom:20px">Évaluez la prestation de l'élève</p>
+      <div style="display:flex;gap:14px">${btn('✅ Réussi','oralPass()','teal','full lg')}${btn('❌ À refaire','oralFail()','red','full lg')}</div>
+    </div>`;
+  }
+  return`<div class="card fadein"><div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:2rem">${content.e}</div>
+    <h3 class="pop" style="color:var(--amber);font-size:1.25rem;margin-top:4px">${content.t}</h3>
+  </div>${body}</div>`;
+}
+function checkOCode(){const v=(document.getElementById('ocode')||{}).value||'';if(v===S.tc){E.step='pvalidate';render();}else{const e=document.getElementById('oerr');if(e)e.textContent='Code incorrect';}}
+function oralPass(){
+  if(S.scr==='l3or'){S.res['M3-Oral']={passed:true};S.pts+=50;go('l3d');}
+  else{S.res['M5-Oral']={passed:true};S.pts+=50;go('l5d');}
+}
+function oralFail(){
+  if(S.scr==='l3or'){S.res['M3-Oral']={passed:false};if((S.l3i||0)<SIT.length-1){S.l3i++;E={step:'card'};render();}else go('l3d');}
+  else{S.res['M5-Oral']={passed:false};if((S.l5i||0)<REP.length-1){S.l5i++;E={step:'card'};render();}else go('l5d');}
+}
+
+/* ═══════════ FINAL CODE ═══════════ */
+function vFinal(){
+  const chips=S.rv.map(w=>`<div style="background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;padding:7px 18px;border-radius:50px;font-family:'Poppins';font-weight:900;font-size:1.05rem;display:inline-block;margin:3px">${w}</div>`).join('');
+  return`<div class="card fadein" style="border-top:4px solid var(--blue)">
+    <div style="text-align:center;margin-bottom:22px"><div style="font-size:3rem">🔐</div>
+      <h2 class="pop" style="color:var(--blue);font-size:1.75rem;margin-top:7px">Master Code</h2>
+      <p style="color:#888;font-size:.88rem;margin-top:4px">Recomposez la phrase secrète avec vos 5 fragments</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#EBF5FB,#E0F2F1);border-radius:14px;padding:18px;margin-bottom:20px">
+      <div class="pop" style="color:var(--blue);margin-bottom:10px;font-size:.9rem">🧩 Vos fragments :</div>
+      <div style="margin-bottom:8px">${chips}</div>
+      <p style="color:#AAA;font-size:.78rem">⚠️ Ils sont dans le désordre — trouvez la bonne phrase !</p>
+    </div>
+    <label style="font-weight:700;display:block;margin-bottom:7px;font-size:.88rem;color:#444">✍️ Entrez la phrase complète :</label>
+    <input id="fc" type="text" placeholder="_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _" style="font-size:1rem;text-align:center;letter-spacing:.04em;margin-bottom:9px" onkeydown="if(event.key==='Enter')checkFinal()">
+    <div id="fe" style="color:var(--red);font-weight:700;font-size:.83rem;min-height:17px;margin-bottom:10px"></div>
+    <div style="text-align:center">${btn('🔓 Sauver The Grand Store !','checkFinal()','blue','lg')}</div>
+  </div>`;
+}
+function checkFinal(){
+  const v=((document.getElementById('fc')||{}).value||'').trim().toUpperCase().replace(/\s+/g,' ');
+  if(v==='THE CUSTOMER IS ALWAYS RIGHT'){S.t1=Date.now();go('vic');}
+  else{const e=document.getElementById('fe');if(e)e.textContent=`❌ Code incorrect. Réarrangez vos ${S.rv.length} fragments !`;}
+}
+
+/* ═══════════ VICTORY ═══════════ */
+function vVictory(){
+  const dur=ftm(S.t0,S.t1);
+  const r=starRating(S.pts,350);
+  const parts=S.g.p.map(p=>`<span class="chip">${p.fn}-${p.ln}</span>`).join(' ');
+  return`<div style="background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:20px;padding:32px;text-align:center;color:#fff;margin-bottom:18px">
+    <div style="font-size:3rem;margin-bottom:8px">🎉🏆🎊</div>
+    <h1 class="pop" style="font-size:2rem;margin-bottom:7px">Mission accomplie !</h1>
+    <p style="opacity:.9;margin-bottom:4px">The Grand Store est sauvé ! 🏪</p>
+    <div style="font-family:'Poppins';font-size:1.15rem;margin-top:14px;background:rgba(255,255,255,.18);padding:10px 22px;border-radius:50px;display:inline-block">
+      THE CUSTOMER IS ALWAYS RIGHT ✓
+    </div>
+  </div>
+  <div class="card"><div class="pop" style="color:var(--blue);margin-bottom:14px">📊 Résumé de mission</div>
+    <div style="text-align:center;margin-bottom:14px">${stars(r.s)} <span style="font-weight:700;color:var(--amber);margin-left:6px">${r.msg}</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--bl);padding:14px;border-radius:13px;text-align:center"><div class="pop" style="font-size:2rem;color:var(--blue)">${S.pts}</div><div style="color:#888;font-size:.8rem">Points</div></div>
+      <div style="background:var(--tl);padding:14px;border-radius:13px;text-align:center"><div class="pop" style="font-size:1.5rem;color:var(--teal)">${dur}</div><div style="color:#888;font-size:.8rem">Durée</div></div>
+    </div>
+    <div style="margin-bottom:16px"><div style="font-weight:700;font-size:.88rem;margin-bottom:6px">👥 Équipe : <span style="color:var(--blue)">${S.g.n}</span></div><div>${parts}</div></div>
+    ${btn('📥 Voir & imprimer le rapport',"go('rep')",'blue','full lg')}
+  </div>`;
+}
+
+/* ═══════════ REPORT ═══════════ */
+function vReport(){openPDF();}
+function openPDF(){
+  const dur=S.t1?fmt(S.t0,S.t1):(S.t0?'En cours':'—');
+  const pmax=350;
+  const pct=Math.min(100,Math.round((S.pts/pmax)*100));
+  const medal=pct>=85?'🥇':pct>=65?'🥈':pct>=45?'🥉':'🎯';
+  const parts=(S.g.p||[]).map(p=>`<span style="background:var(--blue);color:#fff;padding:3px 9px;border-radius:50px;font-size:.79rem;font-weight:700;margin:2px;display:inline-block">${p.fn}-${p.ln}</span>`).join(' ');
+
+  /* ── Point breakdown ── */
+  const r=S.res;
+  const pRows=[
+    r['L1-Ex1']?{label:'M1 — Vocabulaire Ex.1',score:r['L1-Ex1'].score,passed:r['L1-Ex1'].passed,pts:r['L1-Ex1'].passed?50:0}:{},
+    r['L1-Ex2']?{label:'M1 — Vocabulaire Rattrapage',score:r['L1-Ex2'].score,passed:r['L1-Ex2'].passed,pts:r['L1-Ex2'].passed?50:0}:null,
+    r['L2-VF']?{label:'M2 — Lecture V/F',score:r['L2-VF'].score,passed:r['L2-VF'].passed,pts:null}:null,
+    r['L2-QCM']?{label:'M2 — Lecture QCM',score:r['L2-QCM'].score,passed:r['L2-QCM'].passed,pts:(r['L2-VF']?.passed&&r['L2-QCM']?.passed)?100:-25}:null,
+    r['L3-Oral']?{label:'M3 — Expression orale',score:null,oral:true,passed:r['L3-Oral'].passed,pts:r['L3-Oral'].passed?50:0}:null,
+    r['L4-Ex1']?{label:'M4 — Correspondance Ex.1',score:r['L4-Ex1'].score,passed:r['L4-Ex1'].passed,pts:r['L4-Ex1'].passed?50:0}:null,
+    r['L4-Ex2']?{label:'M4 — Correspondance Rattrapage',score:r['L4-Ex2'].score,passed:r['L4-Ex2'].passed,pts:r['L4-Ex2'].passed?50:0}:null,
+    r['L5-Oral']?{label:'M5 — Compte rendu oral',score:null,oral:true,passed:r['L5-Oral'].passed,pts:r['L5-Oral'].passed?50:0}:null
+  ].filter(Boolean).filter(x=>Object.keys(x).length);
+  const ptTableRows=pRows.map(x=>{
+    const scoreStr=x.score!=null?`${x.score}/10`:x.oral?'Oral':'—';
+    const ptsStr=x.pts===null?'(inclus)':x.pts>0?`+${x.pts} pts`:x.pts<0?`${x.pts} pts pénalité`:'0 pt';
+    const bg=x.pts===null?'#F9F9F9':x.pts>0?'#EDF9EF':x.pts<0?'#FFF0F0':'#FFF8EE';
+    const sc=x.pts===null?'#888':x.pts>0?'#1A7A27':x.pts<0?'#9A1A1A':'#888';
+    return `<tr style="background:${bg}">
+      <td style="padding:8px 10px;font-size:.82rem;font-weight:700">${x.label}</td>
+      <td style="padding:8px 10px;text-align:center;font-size:.82rem">${scoreStr}</td>
+      <td style="padding:8px 10px;text-align:center"><span style="background:${x.passed?'#6BCB77':x.pts===null?'#888':'#FF6B6B'};color:#fff;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:800">${x.passed?'✓ Réussi':x.pts===null?'—':'✗'}</span></td>
+      <td style="padding:8px 10px;text-align:center;font-weight:800;color:${sc};font-size:.84rem">${ptsStr}</td>
+    </tr>`;
+  }).join('');
+
+  /* ── Detailed answers ── */
+  const allA=S.allAns||[];
+  const byLvl={};
+  allA.forEach(a=>{if(!byLvl[a.level])byLvl[a.level]=[];byLvl[a.level].push(a);});
+  const LBL={'L1-Ex1':'Vocabulaire Ex.1','L1-Ex2':'Vocabulaire Rattrapage','L2-VF':'Lecture — Vrai/Faux','L2-QCM':'Lecture — QCM','L4-Ex1':'Correspondance Ex.1','L4-Ex2':'Correspondance Rattrapage'};
+  const detHTML=Object.keys(LBL).map(k=>{
+    const items=byLvl[k];
+    if(!items||!items.length)return'';
+    const rows=items.map((a,idx)=>`<tr style="background:${idx%2===0?'#FAFAFA':'#fff'}">
+      <td style="padding:7px 10px;font-size:.8rem;color:#444">${a.question}</td>
+      <td style="padding:7px 10px;font-size:.8rem;color:${a.ok?'#1A7A27':'#9A1A1A'};font-weight:${a.ok?'600':'700'}">${a.given||'—'}</td>
+      <td style="padding:7px 10px;font-size:.8rem;color:#1A7A27;font-weight:600">${a.correct}</td>
+      <td style="padding:7px 10px;text-align:center;font-size:1rem">${a.ok?'✅':'❌'}</td>
+    </tr>`).join('');
+    const ok=items.filter(a=>a.ok).length;
+    return `<div style="margin-bottom:16px">
+      <div style="font-weight:800;font-size:.82rem;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">📋 ${LBL[k]} — ${ok}/${items.length} correctes</div>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #EEE;border-radius:10px;overflow:hidden">
+        <tr style="background:var(--blue)"><th style="padding:7px 10px;text-align:left;font-size:.77rem;color:#fff">Question</th><th style="padding:7px 10px;text-align:left;font-size:.77rem;color:#fff">Réponse donnée</th><th style="padding:7px 10px;text-align:left;font-size:.77rem;color:#fff">Réponse correcte</th><th style="padding:7px 10px;text-align:center;font-size:.77rem;color:#fff">✓/✗</th></tr>
+        ${rows}
+      </table>
+    </div>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Rapport — The Grand Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',sans-serif;background:#F8F8F8;padding:22px;color:#333;font-size:14px}
+  @media print{body{background:#fff;padding:8px}.noprint{display:none!important}}
+  .noprint{margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .bp{background:var(--blue);color:#fff;border:none;padding:9px 22px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.87rem}
+  .bc{background:#E0E0E0;color:#555;border:none;padding:9px 22px;border-radius:50px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;font-size:.87rem}
+  .card{background:#fff;border-radius:13px;box-shadow:0 2px 10px rgba(0,0,0,.07);padding:16px;margin-bottom:12px}
+  @page{margin:1.2cm}
+</style></head><body>
+<div style="max-width:800px;margin:0 auto">
+<div class="noprint">
+  <button class="bp" onclick="window.print()">🖨️ Imprimer / Enregistrer PDF</button>
+  <button class="bc" onclick="window.close()">✕ Fermer</button>
+</div>
+
+<div style="background:linear-gradient(135deg,#FF6B6B,var(--blue),#4ECDC4);border-radius:16px;padding:24px;text-align:center;color:#fff;margin-bottom:13px;print-color-adjust:exact;-webkit-print-color-adjust:exact">
+  <div style="font-size:2rem;margin-bottom:6px">🏪</div>
+  <div style="font-weight:900;font-size:1.55rem;margin-bottom:4px">The Grand Store</div>
+  <div style="opacity:.85;font-size:.85rem">English Escape Game — Bac Pro 1ère Commerce</div>
+  <div style="opacity:.65;font-size:.76rem;margin-top:4px">${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+</div>
+
+<div class="card" style="display:flex;align-items:center;gap:13px;flex-wrap:wrap">
+  <div style="font-size:1.8rem">👥</div>
+  <div style="flex:1"><div style="font-weight:900;font-size:1rem">${S.g.n||'—'}</div><div style="margin-top:5px">${parts}</div></div>
+  <div style="text-align:center;background:#F8F8F8;border-radius:10px;padding:10px 16px;border:1px solid #EEE">
+    <div style="font-weight:900;font-size:1.85rem;color:var(--blue)">${S.pts}</div>
+    <div style="color:#AAA;font-size:.74rem">pts · ${dur}</div>
+  </div>
+</div>
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+    <div style="font-weight:800;font-size:.9rem">${medal} Score global</div>
+    <div style="font-weight:800;font-size:1rem;color:var(--blue)">${pct}%</div>
+  </div>
+  <div style="background:#F0F0F0;border-radius:50px;height:10px;overflow:hidden;margin-bottom:4px;print-color-adjust:exact;-webkit-print-color-adjust:exact">
+    <div style="height:100%;border-radius:50px;background:linear-gradient(135deg,#FF6B6B,var(--blue),#4ECDC4);width:${pct}%"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:.71rem;color:#AAA"><span>0</span><span>350 pts max</span></div>
+</div>
+
+<div class="card">
+  <div style="font-weight:800;color:var(--blue);margin-bottom:10px;font-size:.88rem">⭐ Décompte des points</div>
+  <table style="width:100%;border-collapse:collapse;border:1px solid #EEE;border-radius:10px;overflow:hidden">
+    <tr style="background:var(--blue)"><th style="padding:8px 10px;text-align:left;font-size:.77rem;color:#fff">Mission / Exercice</th><th style="padding:8px 10px;text-align:center;font-size:.77rem;color:#fff">Score</th><th style="padding:8px 10px;text-align:center;font-size:.77rem;color:#fff">Résultat</th><th style="padding:8px 10px;text-align:center;font-size:.77rem;color:#fff">Points</th></tr>
+    ${ptTableRows}
+    <tr style="background:#333"><td colspan="3" style="padding:8px 10px;font-weight:800;font-size:.83rem;color:#fff">TOTAL</td><td style="padding:8px 10px;text-align:center;font-weight:900;font-size:.95rem;color:#FFD93D">${S.pts} / 350 pts</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <div style="font-weight:800;color:var(--blue);margin-bottom:11px;font-size:.88rem">📋 Résultats détaillés — réponses et corrections</div>
+  ${detHTML||'<p style="color:#888;font-size:.85rem;font-style:italic">Aucune donnée de réponse enregistrée.</p>'}
+</div>
+
+<div style="background:linear-gradient(135deg,#FF6B6B,var(--blue),#4ECDC4);border-radius:13px;padding:12px 20px;text-align:center;font-weight:900;font-size:1.15rem;color:#fff;margin-bottom:12px;letter-spacing:.03em;print-color-adjust:exact;-webkit-print-color-adjust:exact">
+  ✅ THE CUSTOMER IS ALWAYS RIGHT
+</div>
+<div style="text-align:center;color:#BBB;font-size:.72rem">Créé par C. iemfre · Bac Pro 1ère Commerce · The Grand Store</div>
+</div>
+<script>window.onload=()=>setTimeout(()=>window.print(),700);<\/script>
+</body></html>`;
+
+  const w=window.open('','_blank');
+  if(w){w.document.write(html);w.document.close();}
+  else{alert('⚠️ Autorisez les pop-ups pour générer le PDF.');}
+}
+
+/* ═══════════ RGPD ═══════════ */
+function vRGPD(){
+  return`<div style="min-height:100vh;padding:20px 18px 40px">
+  <div style="max-width:580px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-top:8px">
+      <span style="color:#AAA;cursor:pointer;font-size:.83rem;font-weight:700" onclick="go('home')">← Retour</span>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:16px;padding:26px;text-align:center;color:#fff;margin-bottom:18px;print-color-adjust:exact;-webkit-print-color-adjust:exact">
+      <div style="font-size:2.4rem;margin-bottom:8px">🔒</div>
+      <h1 class="pop" style="font-size:1.55rem;margin-bottom:4px">Protection des données personnelles</h1>
+      <p style="opacity:.75;font-size:.82rem">The Grand Store — English Escape Game</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--teal);margin-bottom:10px">
+      <p style="color:#333;font-size:.9rem;line-height:1.82">Cette application est un outil pédagogique développé pour un usage en classe.</p>
+    </div>
+    <div style="display:grid;gap:9px;margin-bottom:18px">
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Aucune donnée n'est transmise à un serveur externe : toutes les informations (identifiant, réponses, score) restent uniquement dans la mémoire de votre navigateur, le temps de la partie en cours.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Aucun cookie tiers, aucun traceur publicitaire, aucun appel à une API externe n'est utilisé.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom (utilisées uniquement pour générer un identifiant au format XX-YY, sans jamais collecter votre identité complète), ainsi que vos réponses aux exercices.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Ces données sont sauvegardées localement sur votre appareil (via le stockage local du navigateur) afin de permettre la reprise de la progression entre plusieurs séances, sur le même appareil. Elles ne sont accessibles que depuis le navigateur utilisé et ne sont jamais transmises à un tiers. Vous pouvez les effacer à tout moment en vidant le cache de votre navigateur ou en démarrant une nouvelle partie.</p>
+      </div>
+      <div class="card" style="padding:15px 16px">
+        <p style="color:#333;font-size:.88rem;line-height:1.82">Le PDF généré est créé localement dans votre navigateur ; il n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur.</p>
+      </div>
+    </div>
+  </div></div>`;
+}
+
+/* ═══════════ ROUTER ═══════════ */
+function go(scr,ei={}){E=ei;S.scr=scr;saveProgress();render();window.scrollTo(0,0);}
+function render(){document.getElementById('app').innerHTML=view();}
+function view(){
+  const sc=S.scr;
+  if(sc==='home')return vHome();
+  if(sc==='rules')return vRules();
+  if(sc==='rgpd')return vRGPD();
+  if(sc==='tlg')return vLogin('Interface Professeur','tdb');
+  if(sc==='tdb')return vTeacher();
+  if(sc==='slg')return vLogin('Connexion Équipe','grp');
+  if(sc==='grp')return vGroup();
+
+  const W=hdr;
+  if(sc==='l1i')return W(1)+`<div class="page">${lvlIntro('📋','Mission 1 — Induction Room','Vocabulaire commercial','<p style="font-weight:700;margin-bottom:7px">Welcome to The Grand Store!</p><p style="font-size:.88rem;color:#555;line-height:1.7">Avant d\'accéder au shop floor, prouvez que vous maîtrisez le vocabulaire commercial essentiel. 10 questions. Seuil de réussite : ≥ 8/10.</p>',"go('l1q1',{qs:Q1,cur:0,ans:{},done:false,lbl:'M1-Ex1'})",'blue')}</div>`;
+  if(sc==='l1q1')return W(1)+`<div class="page"><div class="card card-blue"><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="background:var(--blue);color:#fff;padding:3px 12px;border-radius:50px;font-weight:800;font-size:.8rem">Ex. 1</span><strong style="font-size:.95rem">QCM — Vocabulaire</strong></div>${vQCM()}</div></div>`;
+  if(sc==='l1q2')return W(1)+`<div class="page"><div class="ko" style="margin-bottom:12px">💪 Score insuffisant — exercice de rattrapage !</div><div class="card card-amber"><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="background:var(--amber);color:#333;padding:3px 12px;border-radius:50px;font-weight:800;font-size:.8rem">Rattrapage</span><strong style="font-size:.95rem">QCM — Vocabulaire (2)</strong></div>${vQCM()}</div></div>`;
+  if(sc==='l1d')return W(1)+`<div class="page">${indiceScreen(0,"go('l2i')")}</div>`;
+
+  if(sc==='l2i')return W(2)+`<div class="page">${lvlIntro('🔍','Mission 2 — Intelligence Desk','Compréhension écrite','<p style="font-weight:700;margin-bottom:7px">A file has been recovered!</p><p style="font-size:.88rem;color:#555;line-height:1.7">Deux textes professionnels, deux exercices <strong>obligatoires</strong>. ≥ 8/10 aux deux pour avancer.</p><p style="color:var(--red);font-weight:700;font-size:.84rem;margin-top:8px">⚠️ Échec sur l\'un des deux = −25 pts + retour Mission 1</p>',"go('l2vf',{qs:VF,text:T1,ans:{},done:false})",'teal')}</div>`;
+  if(sc==='l2vf')return W(2)+`<div class="page"><div class="card card-teal"><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="background:var(--teal);color:#fff;padding:3px 12px;border-radius:50px;font-weight:800;font-size:.8rem">Ex. 1 / 2</span><strong style="font-size:.95rem">Vrai / Faux</strong></div>${vVF()}</div></div>`;
+  if(sc==='l2qm')return W(2)+`<div class="page"><div class="card card-teal"><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="background:var(--teal);color:#fff;padding:3px 12px;border-radius:50px;font-weight:800;font-size:.8rem">Ex. 2 / 2</span><strong style="font-size:.95rem">QCM — The Weekly Briefing</strong></div><div class="rtxt"><strong style="color:var(--blue2);font-size:.8rem">📄 The Weekly Briefing</strong><br><br>${T2.replace(/\n\n/g,'<br><br>')}</div>${vQCM()}</div></div>`;
+  if(sc==='l2fl')return W(2)+`<div class="page"><div class="card" style="text-align:center;padding:32px 20px"><div style="font-size:2.5rem;margin-bottom:8px">😓</div><h2 class="pop" style="color:var(--red);margin-bottom:10px">Score insuffisant</h2><p style="color:#666;margin-bottom:14px;font-size:.9rem">≥ 80% requis aux deux exercices pour passer à la Mission 3.</p><div class="ko" style="margin-bottom:22px">−25 points appliqués • Retour Mission 1</div>${btn('🔄 Retour Mission 1',"go('l1i')",'red','lg')}</div></div>`;
+  if(sc==='l2d')return W(2)+`<div class="page">${indiceScreen(1,"go('l3i')")}</div>`;
+
+  if(sc==='l3i')return W(3)+`<div class="page">${lvlIntro('🎤','Mission 3 — Situation Room','Expression orale','<p style="font-weight:700;margin-bottom:7px">A live customer situation!</p><p style="font-size:.88rem;color:#555;line-height:1.7">Un membre de l\'équipe est tiré au sort. Il lit la carte de situation et gère l\'interaction en anglais. No notes, no preparation — improvisation professionnelle !</p>',"go('l3or',{step:'card'});S.l3i=0",'blue')}</div>`;
+  if(sc==='l3or')return W(3)+`<div class="page">${vOral(SIT[S.l3i||0])}</div>`;
+  if(sc==='l3d')return W(3)+`<div class="page">${indiceScreen(2,"go('l4i')")}</div>`;
+
+  if(sc==='l4i')return W(4)+`<div class="page">${lvlIntro('📌','Mission 4 — The Briefing Room','Correspondance commerciale','<p style="font-weight:700;margin-bottom:7px">The briefing files are scrambled!</p><p style="font-size:.88rem;color:#555;line-height:1.7">Associez chaque terme commercial à sa définition exacte. ⏱ 6 minutes recommandées. Seuil : ≥ 8/10.</p>',"go('l4e1',{ps:M1,sh:shuf(M1.map((_,i)=>i)),sel:null,mt:{},done:false,lbl:'M4-Ex1'})",'blue')}</div>`;
+  if(sc==='l4e1')return W(4)+`<div class="page"><div class="card card-blue"><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="background:#7B1FA2;color:#fff;padding:3px 12px;border-radius:50px;font-weight:800;font-size:.8rem">Ex. 1</span><strong style="font-size:.95rem">Correspondance — Série A</strong></div>${vMatch()}</div></div>`;
+  if(sc==='l4e2')return W(4)+`<div class="page"><div class="ko" style="margin-bottom:12px">💪 Rattrapage — nouvelle série !</div><div class="card card-amber"><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><span style="background:var(--amber);color:#333;padding:3px 12px;border-radius:50px;font-weight:800;font-size:.8rem">Rattrapage</span><strong style="font-size:.95rem">Correspondance — Série B</strong></div>${vMatch()}</div></div>`;
+  if(sc==='l4d')return W(4)+`<div class="page">${indiceScreen(3,"go('l5i')")}</div>`;
+
+  if(sc==='l5i')return W(5)+`<div class="page">${lvlIntro('📊',"Mission 5 — The Manager's Office",'Compte rendu oral','<p style="font-weight:700;margin-bottom:7px">Final mission — the manager needs your report!</p><p style="font-size:.88rem;color:#555;line-height:1.7">Lisez la fiche d\'incident et présentez un compte rendu structuré en anglais. Langage professionnel exigé.</p>',"go('l5or',{step:'card'});S.l5i=0",'teal')}</div>`;
+  if(sc==='l5or')return W(5)+`<div class="page">${vOral(REP[S.l5i||0],true)}</div>`;
+  if(sc==='l5d')return W(5)+`<div class="page">${indiceScreen(4,"go('fin')")}</div>`;
+
+  if(sc==='fin')return W(5)+`<div class="page">${vFinal()}</div>`;
+  if(sc==='vic')return W(5)+`<div class="page">${vVictory()}</div>`;
+  if(sc==='rep')return vReport();
+  return'<p>Écran inconnu</p>';
+}
+render();
+</script></body></html>
